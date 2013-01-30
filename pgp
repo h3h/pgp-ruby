@@ -7,7 +7,7 @@ CMDS = {
 	sign: 	['sign'],
 	help: 	['help', '--help', '-?'],
 	pull: 	['pull', 'refresh'],
-	push:	['push', 'publish'],
+	push:		['push', 'publish'],
 	export: ['export', 'write'],
 }
 
