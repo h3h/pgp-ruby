@@ -8,7 +8,10 @@ CMDS = {
 	help: 	['help', '--help', '-?'],
 	pull: 	['pull', 'refresh'],
 	push:	['push', 'publish'],
+	export: ['export', 'write'],
 }
+
+username = ENV['USER']
 
 case
 when CMDS[:list].include?(nice_cmd)
@@ -32,9 +35,7 @@ when CMDS[:sign].include?(nice_cmd)
 	puts "\n\nDoes the fingerprint match what you expected? (yes/no)"
 	ans = STDIN.gets
 	if ans.chomp.downcase == "yes"
-		file = "gpg_#{id}_signed_by_#{`whoami`}.asc"
-		system("gpg --sign-key #{id} && gpg --armor --export #{id} --output #{file}")
-		puts "Exported signed key to #{file}."
+		system("pgp export #{id}")
 	end
 
 when CMDS[:pull].include?(nice_cmd)
@@ -47,6 +48,16 @@ when CMDS[:push].include?(nice_cmd)
 	end
 	id = ARGV[1]
 	system("gpg --send-key #{id}")
+
+when CMDS[:export].include?(nice_cmd)
+	unless ARGV[1]
+		warn "Usage: pgp export [key-id] [file]"
+		exit 1
+	end
+	id = ARGV[1]
+	file = ARGV[2] || "gpg_#{id}_signed_by_#{username}.asc"
+	system("gpg --armor --output '#{file}' --export #{id}")
+	puts "Exported signed key to #{file}."
 
 when CMDS[:help].include?(nice_cmd)
 	puts "Usage: pgp [command] [args...]\n\n"
