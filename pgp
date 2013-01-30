@@ -3,68 +3,68 @@
 nice_cmd = ARGV[0]
 
 CMDS = {
-	list: 	['list', 'ls'],
-	sign: 	['sign'],
-	help: 	['help', '--help', '-?'],
-	pull: 	['pull', 'refresh'],
-	push:		['push', 'publish'],
-	export: ['export', 'write'],
+  list:   ['list', 'ls'],
+  sign:   ['sign'],
+  help:   ['help', '--help', '-?'],
+  pull:   ['pull', 'refresh'],
+  push:   ['push', 'publish'],
+  export: ['export', 'write'],
 }
 
 username = ENV['USER']
 
 case
 when CMDS[:list].include?(nice_cmd)
-	if (id = ARGV[1])
-		system("gpg --list-key #{id}")
-	else
-		system("gpg --list-keys")
-	end
+  if (id = ARGV[1])
+    system("gpg --list-key #{id}")
+  else
+    system("gpg --list-keys")
+  end
 
 when CMDS[:sign].include?(nice_cmd)
-	unless ARGV[1]
-		warn "Usage: pgp sign [key-id]"
-		exit 1
-	end
-	id = ARGV[1]
-	unless system("gpg --list-key #{id}")
-		system("gpg --recv-key #{id}")
-	end
- 	system("gpg --fingerprint #{id}")
+  unless ARGV[1]
+    warn "Usage: pgp sign [key-id]"
+    exit 1
+  end
+  id = ARGV[1]
+  unless system("gpg --list-key #{id}")
+    system("gpg --recv-key #{id}")
+  end
+  system("gpg --fingerprint #{id}")
 
-	puts "\n\nDoes the fingerprint match what you expected? (yes/no)"
-	ans = STDIN.gets
-	if ans.chomp.downcase == "yes"
-		system("pgp export #{id}")
-	end
+  puts "\n\nDoes the fingerprint match what you expected? (yes/no)"
+  ans = STDIN.gets
+  if ans.chomp.downcase == "yes"
+    system("pgp export #{id}")
+  end
 
 when CMDS[:pull].include?(nice_cmd)
-	system("gpg --refresh-keys")
+  system("gpg --refresh-keys")
 
 when CMDS[:push].include?(nice_cmd)
-	unless ARGV[1]
-		warn "Usage: pgp push [key-id]"
-		exit 1
-	end
-	id = ARGV[1]
-	system("gpg --send-key #{id}")
+  unless ARGV[1]
+    warn "Usage: pgp push [key-id]"
+    exit 1
+  end
+  id = ARGV[1]
+  system("gpg --send-key #{id}")
 
 when CMDS[:export].include?(nice_cmd)
-	unless ARGV[1]
-		warn "Usage: pgp export [key-id] [file]"
-		exit 1
-	end
-	id = ARGV[1]
-	file = ARGV[2] || "gpg_#{id}_signed_by_#{username}.asc"
-	system("gpg --armor --output '#{file}' --export #{id}")
-	puts "Exported signed key to #{file}."
+  unless ARGV[1]
+    warn "Usage: pgp export [key-id] [file]"
+    exit 1
+  end
+  id = ARGV[1]
+  file = ARGV[2] || "gpg_#{id}_signed_by_#{username}.asc"
+  system("gpg --armor --output '#{file}' --export #{id}")
+  puts "Exported signed key to #{file}."
 
 when CMDS[:help].include?(nice_cmd)
-	puts "Usage: pgp [command] [args...]\n\n"
-	puts "Available commands:"
-	puts ([''] + CMDS.keys).flatten.join("\n\t")
-	puts "\n"
+  puts "Usage: pgp [command] [args...]\n\n"
+  puts "Available commands:"
+  puts ([''] + CMDS.keys).flatten.join("\n\t")
+  puts "\n"
 else
-	system("gpg #{nice_cmd}")
+  system("gpg #{nice_cmd}")
 end
 
