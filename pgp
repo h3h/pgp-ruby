@@ -36,7 +36,8 @@ when CMDS[:sign].include?(nice_cmd)
   puts "\n\nDoes the fingerprint match what you expected? (yes/no)"
   ans = STDIN.gets
   if ans.chomp.downcase == "yes"
-    system("pgp export #{id}")
+    system("gpg --sign-key #{id}") &&
+      system("pgp export #{id}")
   end
 
 when CMDS[:encrypt].include?(nice_cmd)
