@@ -41,13 +41,17 @@ when CMDS[:sign].include?(nice_cmd)
   end
 
 when CMDS[:encrypt].include?(nice_cmd)
-  unless ARGV[1] && ARGV[2] == "for" && ARGV[3]
-    warn "Usage: pgp encrypt [file] for [user]"
+  unless ARGV[1]
+    warn "Usage: pgp encrypt [file] [for [user]]"
     exit 1
   end
   file = ARGV[1]
-  user = ARGV[3]
-  system("gpg --sign --encrypt -r #{user} #{file}")
+  if ARGV[2] == "for" && ARGV[3]
+    user = ARGV[3]
+    system("gpg --sign --encrypt -r #{user} #{file}")
+  else
+    system("gpg --sign --encrypt #{file}")
+  end
 
 when CMDS[:pull].include?(nice_cmd)
   system("gpg --refresh-keys")
