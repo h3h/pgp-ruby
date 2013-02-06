@@ -26,7 +26,7 @@ when CMDS[:list].include?(nice_cmd)
 
 when CMDS[:sign].include?(nice_cmd)
   unless ARGV[1]
-    warn "Usage: pgp sign [key-id]"
+    warn "Usage: pgp sign <key-id>"
     exit 1
   end
   id = ARGV[1]
@@ -44,7 +44,7 @@ when CMDS[:sign].include?(nice_cmd)
 
 when CMDS[:fingerprint].include?(nice_cmd)
   unless ARGV[1]
-    warn "Usage: pgp fingerprint [key-id]"
+    warn "Usage: pgp fingerprint <key-id>"
     exit 1
   end
   id = ARGV[1]
@@ -52,7 +52,7 @@ when CMDS[:fingerprint].include?(nice_cmd)
 
 when CMDS[:encrypt].include?(nice_cmd)
   unless ARGV[1]
-    warn "Usage: pgp encrypt [file] [for [user]]"
+    warn "Usage: pgp encrypt <file> [for <user>]"
     exit 1
   end
   file = ARGV[1]
@@ -68,7 +68,7 @@ when CMDS[:pull].include?(nice_cmd)
 
 when CMDS[:push].include?(nice_cmd)
   unless ARGV[1]
-    warn "Usage: pgp push [key-id]"
+    warn "Usage: pgp push <key-id>"
     exit 1
   end
   id = ARGV[1]
@@ -76,7 +76,7 @@ when CMDS[:push].include?(nice_cmd)
 
 when CMDS[:export].include?(nice_cmd)
   unless ARGV[1]
-    warn "Usage: pgp export [key-id] [file]"
+    warn "Usage: pgp export <key-id> [file]"
     exit 1
   end
   id = ARGV[1]
@@ -86,7 +86,7 @@ when CMDS[:export].include?(nice_cmd)
 
 when CMDS[:import].include?(nice_cmd)
   unless ARGV[1]
-    warn "Usage: pgp import [file]"
+    warn "Usage: pgp import <file>"
     exit 1
   end
   file = ARGV[1]
@@ -101,7 +101,7 @@ when CMDS[:import].include?(nice_cmd)
   end
 
 when CMDS[:help].include?(nice_cmd)
-  puts "Usage: pgp [command] [args...]\n\n"
+  puts "Usage: pgp <command> [args...]\n\n"
   puts "Available commands:"
   puts ([''] + CMDS.keys).flatten.join("\n\t")
   puts "\n"
