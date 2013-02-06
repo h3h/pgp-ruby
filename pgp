@@ -3,32 +3,36 @@
 nice_cmd = ARGV[0]
 
 CMDS = {
-  list:         ['list', 'ls'],
-  sign:         ['sign'],
-  fingerprint:  ['fingerprint'],
-  encrypt:      ['encrypt'],
-  help:         ['help', '--help', '-?'],
-  pull:         ['pull', 'refresh'],
-  push:         ['push', 'publish'],
-  export:       ['export', 'write'],
-  import:       ['import'],
+  list:         {aliases: ['list', 'ls'], usage: "list [key-id]"},
+  sign:         {aliases: ['sign', 's'], usage: "sign <key-id>"},
+  fingerprint:  {aliases: ['fingerprint', 'f'], usage: "fingerprint <key-id>"},
+  encrypt:      {aliases: ['encrypt', 'e'], usage: "encrypt <file> [for <user>]"},
+  help:         {aliases: ['help', '--help', '-?', 'h'], usage: "help [command]"},
+  pull:         {aliases: ['pull', 'refresh'], usage: "pull"},
+  push:         {aliases: ['push', 'publish'], usage: "push <key-id>"},
+  export:       {aliases: ['export', 'write', 'w'], usage: "export <key-id> [file]"},
+  import:       {aliases: ['import', 'i'], usage: "import <file>"},
 }
+
+def usage(cmd, error=true)
+  writer = error ? method(:warn) : method(:puts)
+  writer.call "Usage: #{File.basename($0)} #{CMDS[cmd.to_sym][:usage]}"
+  exit(1) if error
+end
 
 username = ENV['USER']
 
 case
-when CMDS[:list].include?(nice_cmd)
+when CMDS[:list][:aliases].include?(nice_cmd)
   if (id = ARGV[1])
     system("gpg --list-key #{id}")
   else
     system("gpg --list-keys")
   end
 
-when CMDS[:sign].include?(nice_cmd)
-  unless ARGV[1]
-    warn "Usage: pgp sign <key-id>"
-    exit 1
-  end
+when CMDS[:sign][:aliases].include?(nice_cmd)
+  usage(:sign) unless ARGV[1]
+
   id = ARGV[1]
   unless system("gpg --list-key #{id}")
     system("gpg --recv-key #{id}")
@@ -42,19 +46,15 @@ when CMDS[:sign].include?(nice_cmd)
       system("pgp export #{id}")
   end
 
-when CMDS[:fingerprint].include?(nice_cmd)
-  unless ARGV[1]
-    warn "Usage: pgp fingerprint <key-id>"
-    exit 1
-  end
+when CMDS[:fingerprint][:aliases].include?(nice_cmd)
+  usage(:fingerprint) unless ARGV[1]
+
   id = ARGV[1]
   system("gpg --fingerprint #{id}")
 
-when CMDS[:encrypt].include?(nice_cmd)
-  unless ARGV[1]
-    warn "Usage: pgp encrypt <file> [for <user>]"
-    exit 1
-  end
+when CMDS[:encrypt][:aliases].include?(nice_cmd)
+  usage(:encrypt) unless ARGV[1]
+
   file = ARGV[1]
   if ARGV[2] == "for" && ARGV[3]
     user = ARGV[3]
@@ -63,32 +63,26 @@ when CMDS[:encrypt].include?(nice_cmd)
     system("gpg --sign --encrypt #{file}")
   end
 
-when CMDS[:pull].include?(nice_cmd)
+when CMDS[:pull][:aliases].include?(nice_cmd)
   system("gpg --refresh-keys")
 
-when CMDS[:push].include?(nice_cmd)
-  unless ARGV[1]
-    warn "Usage: pgp push <key-id>"
-    exit 1
-  end
+when CMDS[:push][:aliases].include?(nice_cmd)
+  usage(:push) unless ARGV[1]
+
   id = ARGV[1]
   system("gpg --send-key #{id}")
 
-when CMDS[:export].include?(nice_cmd)
-  unless ARGV[1]
-    warn "Usage: pgp export <key-id> [file]"
-    exit 1
-  end
+when CMDS[:export][:aliases].include?(nice_cmd)
+  usage(:export) unless ARGV[1]
+
   id = ARGV[1]
   file = ARGV[2] || "gpg_#{id}_signed_by_#{username}.asc"
   system("gpg --armor --output '#{file}' --export #{id}")
   puts "Exported signed key to #{file}."
 
-when CMDS[:import].include?(nice_cmd)
-  unless ARGV[1]
-    warn "Usage: pgp import <file>"
-    exit 1
-  end
+when CMDS[:import][:aliases].include?(nice_cmd)
+  usage(:import) unless ARGV[1]
+
   file = ARGV[1]
   output = `gpg --import '#{file}' 2>&1`
   if $? == 0
@@ -100,11 +94,15 @@ when CMDS[:import].include?(nice_cmd)
     end
   end
 
-when CMDS[:help].include?(nice_cmd)
-  puts "Usage: pgp <command> [args...]\n\n"
-  puts "Available commands:"
-  puts ([''] + CMDS.keys).flatten.join("\n\t")
-  puts "\n"
+when CMDS[:help][:aliases].include?(nice_cmd)
+  if ARGV[1]
+    usage(ARGV[1], false)
+  else
+    puts "Usage: pgp <command> [args...]\n\n"
+    puts "Available commands:"
+    puts ([''] + CMDS.keys).flatten.join("\n\t")
+    puts "\n"
+  end
 
 else
   system("gpg #{nice_cmd}")
