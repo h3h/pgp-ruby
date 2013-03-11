@@ -6,6 +6,7 @@ CMDS = {
   list:         {aliases: ['list', 'ls'], usage: "list [key-id]"},
   sign:         {aliases: ['sign', 's'], usage: "sign <key-id>"},
   fingerprint:  {aliases: ['fingerprint', 'f'], usage: "fingerprint <key-id>"},
+  decrypt:      {aliases: ['decrypt', 'e'], usage: "decrypt <file>"},
   encrypt:      {aliases: ['encrypt', 'e'], usage: "encrypt <file> [for <user>]"},
   help:         {aliases: ['help', '--help', '-?', 'h'], usage: "help [command]"},
   pull:         {aliases: ['pull', 'refresh'], usage: "pull"},
@@ -51,6 +52,12 @@ when CMDS[:fingerprint][:aliases].include?(nice_cmd)
 
   id = ARGV[1]
   system("gpg --fingerprint #{id}")
+
+when CMDS[:decrypt][:aliases].include?(nice_cmd)
+  usage(:decrypt) unless ARGV[1]
+
+  file = ARGV[1]
+  system("gpg --decrypt #{file}")
 
 when CMDS[:encrypt][:aliases].include?(nice_cmd)
   usage(:encrypt) unless ARGV[1]
