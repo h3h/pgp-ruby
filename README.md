@@ -24,6 +24,8 @@ $ pgp sign 12345EFA
 
 $ pgp encrypt my_file for foo@example.com
 
+$ pgp decrypt my_file.gpg
+
 $ pgp fingerprint 12345EFA
 
 $ pgp import 12345EFA_signed_by_foo.asc
